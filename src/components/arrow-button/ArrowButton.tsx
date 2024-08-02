@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import styles from './ArrowButton.module.scss';
 
 /** Функция для обработки открытия/закрытия формы */
-export type OnClick = () => void;
 export type TArrowButton = {
 	OnClick: () => void;
 	isOpen: boolean;
