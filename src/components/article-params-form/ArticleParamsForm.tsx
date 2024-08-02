@@ -12,11 +12,12 @@ import {
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
+	defaultArticleState,
+	ArticleStateType,
 } from 'src/constants/articleProps';
-import { defaultArticleState } from 'src/constants/articleProps';
 
 //хуки и библиотеки
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import clsx from 'clsx';
 
 //стили
@@ -24,7 +25,11 @@ import styles from './ArticleParamsForm.module.scss';
 import { RadioGroup } from '../radio-group';
 import { Separator } from '../separator';
 
-export const ArticleParamsForm = () => {
+type TArticleParamsForm = {
+	setAppOptions: (value: ArticleStateType) => void; //функция для пропса, чтобы связать с Аппом
+};
+
+export const ArticleParamsForm = (props: TArticleParamsForm) => {
 	//состояние открыто-закрыто
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -60,13 +65,26 @@ export const ArticleParamsForm = () => {
 		setFormOptions({ ...formOptions, contentWidth: value });
 	};
 
+	const onReset = () => {
+		//сбрасывает значения формы
+		setFormOptions(defaultArticleState);
+		props.setAppOptions(defaultArticleState);
+	};
+
+	const onSubmit = (event: FormEvent) => {
+		//сабмит значений формы
+		event.preventDefault();
+		setFormOptions(formOptions);
+		props.setAppOptions(formOptions);
+	};
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} OnClick={onOpenClick} />
 
 			<aside
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
-				<form className={styles.form}>
+				<form className={styles.form} onSubmit={onSubmit}>
 					<Text as={'h2'} size={31} weight={800} uppercase={true}>
 						Задайте параметры
 					</Text>
@@ -98,7 +116,7 @@ export const ArticleParamsForm = () => {
 						title='Ширина контента'
 						onChange={changeContentWidth}></Select>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' type='reset' />
+						<Button title='Сбросить' type='reset' onClick={onReset} />
 						<Button title='Применить' type='submit' />
 					</div>
 				</form>
