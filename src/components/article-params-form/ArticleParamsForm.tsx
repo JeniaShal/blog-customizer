@@ -34,7 +34,7 @@ export const ArticleParamsForm = (props: TArticleParamsForm) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	//ссылка на aside до его отрисовки
-	const asideRef = useRef<HTMLFormElement>(null);
+	const asideRef = useRef<HTMLFormElement | null>(null);
 
 	//функция тоггла открытия-закрытия
 	const onOpenClick = () => {
@@ -42,24 +42,20 @@ export const ArticleParamsForm = (props: TArticleParamsForm) => {
 	};
 
 	//функция закрытия по клику за пределами формы
-
-	useEffect(() => {
-		// if (!isOpen) return;
-
-		const onCliskOutsideForm = (event: MouseEvent) => {
-			if (
-				asideRef.current &&
-				!asideRef.current.contains(event.target as Node)
-			) {
+	const onCliskOutsideForm = (event: MouseEvent) => {
+		if (asideRef.current && (event.target as Node)) {
+			if (!asideRef.current.contains(event.target as Node) && isOpen) {
 				setIsOpen(false);
 			}
-		};
+		}
+	};
 
-		document.addEventListener('mousedown', onCliskOutsideForm);
-		// else {window.removeEventListener('mousedown', onCliskOutsideForm)}
+	//навешивание функции закрытия по клику через useEffect
+	useEffect(() => {
+		window.addEventListener('mousedown', onCliskOutsideForm);
 
 		return () => {
-			document.removeEventListener('mousedown', onCliskOutsideForm);
+			window.removeEventListener('mousedown', onCliskOutsideForm);
 		};
 	}, [isOpen]);
 
@@ -108,6 +104,7 @@ export const ArticleParamsForm = (props: TArticleParamsForm) => {
 			<ArrowButton isOpen={isOpen} OnClick={onOpenClick} />
 
 			<aside
+				ref={asideRef}
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
 				<form className={styles.form} onSubmit={onSubmit}>
 					<Text as={'h2'} size={31} weight={800} uppercase={true}>
