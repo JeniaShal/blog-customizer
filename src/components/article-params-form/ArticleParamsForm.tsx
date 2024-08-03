@@ -31,33 +31,43 @@ type TArticleParamsForm = {
 
 export const ArticleParamsForm = (props: TArticleParamsForm) => {
 	//состояние открыто-закрыто
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	//ссылка на aside до его отрисовки
 	const asideRef = useRef<HTMLFormElement | null>(null);
 
 	//функция тоггла открытия-закрытия
-	const onOpenClick = () => {
-		setIsOpen(!isOpen);
+	const onMenuOpenClick = () => {
+		setIsMenuOpen(!isMenuOpen);
 	};
 
-	//функция закрытия по клику за пределами формы
-	const onCliskOutsideForm = (event: MouseEvent) => {
-		if (asideRef.current && (event.target as Node)) {
-			if (!asideRef.current.contains(event.target as Node) && isOpen) {
-				setIsOpen(false);
-			}
-		}
-	};
+	// const onCliskOutsideForm = (event: MouseEvent) => {
+	// 	if (asideRef.current && (event.target as Node)) {
+	// 		if (!asideRef.current.contains(event.target as Node) && isMenuOpen) {
+	// 			setIsMenuOpen(false);
+	// 		}
+	// 	}
+	// };
 
 	//навешивание функции закрытия по клику через useEffect
 	useEffect(() => {
-		window.addEventListener('mousedown', onCliskOutsideForm);
+		const onCliskOutsideForm = (event: MouseEvent) => {
+			//функция закрытия по клику за пределами формы
+			if (asideRef.current && (event.target as Node)) {
+				if (!asideRef.current.contains(event.target as Node) && isMenuOpen) {
+					setIsMenuOpen(false);
+				}
+			}
+		};
+		if (isMenuOpen) {
+			window.addEventListener('mousedown', onCliskOutsideForm);
+		} //слушатель навешивается только, если меню открыто
+		else window.removeEventListener('mousedown', onCliskOutsideForm);
 
 		return () => {
 			window.removeEventListener('mousedown', onCliskOutsideForm);
 		};
-	}, [isOpen]);
+	}, [isMenuOpen]);
 
 	//опции формы
 	const [formOptions, setFormOptions] = useState(defaultArticleState);
@@ -101,11 +111,13 @@ export const ArticleParamsForm = (props: TArticleParamsForm) => {
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} OnClick={onOpenClick} />
+			<ArrowButton isOpen={isMenuOpen} OnClick={onMenuOpenClick} />
 
 			<aside
 				ref={asideRef}
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form className={styles.form} onSubmit={onSubmit}>
 					<Text as={'h2'} size={31} weight={800} uppercase={true}>
 						Задайте параметры
