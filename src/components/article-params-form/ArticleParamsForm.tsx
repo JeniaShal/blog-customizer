@@ -17,7 +17,7 @@ import {
 } from 'src/constants/articleProps';
 
 //хуки и библиотеки
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 //стили
@@ -33,10 +33,35 @@ export const ArticleParamsForm = (props: TArticleParamsForm) => {
 	//состояние открыто-закрыто
 	const [isOpen, setIsOpen] = useState(false);
 
+	//ссылка на aside до его отрисовки
+	const asideRef = useRef<HTMLFormElement>(null);
+
 	//функция тоггла открытия-закрытия
 	const onOpenClick = () => {
 		setIsOpen(!isOpen);
 	};
+
+	//функция закрытия по клику за пределами формы
+
+	useEffect(() => {
+		// if (!isOpen) return;
+
+		const onCliskOutsideForm = (event: MouseEvent) => {
+			if (
+				asideRef.current &&
+				!asideRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', onCliskOutsideForm);
+		// else {window.removeEventListener('mousedown', onCliskOutsideForm)}
+
+		return () => {
+			document.removeEventListener('mousedown', onCliskOutsideForm);
+		};
+	}, [isOpen]);
 
 	//опции формы
 	const [formOptions, setFormOptions] = useState(defaultArticleState);
