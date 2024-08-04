@@ -25,6 +25,10 @@
 	transition: transform 0.5s ease;
 }
 
+.arrow:hover {
+	cursor: pointer;
+}
+
 .arrow_open {
 	transform: rotate(0deg);
 }
